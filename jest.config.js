@@ -5,6 +5,7 @@ const baseConfig = {
   testEnvironment: "jsdom",
   moduleFileExtensions: ["js", "jsx", "json", "ts", "tsx"],
   moduleNameMapper: {
+    "^react$": "<rootDir>/node_modules/react",
     "\\.css$": "identity-obj-proxy",
     "\\.sass$": "identity-obj-proxy",
     "\\.scss$": "identity-obj-proxy",
@@ -13,11 +14,9 @@ const baseConfig = {
     "^services/(.*)$": "<rootDir>/src/services/$1",
     "^utils/(.*)$": "<rootDir>/src/utils/$1",
     "^@heavyai/data-layer$":
-      "<rootDir>/node_modules/@heavyai/data-layer/packages/data-layer/dist/heavyai-data-layer.js",
+      "<rootDir>/node_modules/@heavyai/data-layer/dist/heavyai-data-layer.js",
 
-    "^vega-lite$": "<rootDir>/node_modules/vega-lite/build/vega-lite.min.js",
-    "^fs$": "<rootDir>/test-config/__mocks__/fs.js",
-    "^node:fs$": "<rootDir>/test-config/__mocks__/fs.js"
+    "^vega-lite$": "<rootDir>/node_modules/vega-lite/build/vega-lite.min.js"
   },
   modulePaths: ["<rootDir>/src/", "<rootDir>/test-config/"],
   transform: {
@@ -25,7 +24,7 @@ const baseConfig = {
     "\\.[jt]sx?$": "babel-jest"
   },
   transformIgnorePatterns: [
-    "<rootDir>/node_modules/(?!(@heavyai|robust-predicates|delaunator|d3-.*|axios|internmap|formdata-polyfill|fetch-blob|data-uri-to-buffer|node-fetch|vega|suneditor|quill-next|@quill-next|parchment|lodash-es|legendables|@mapbox-controls|@mapbox|vega-.*|cheerio|cheerio-.*))"
+    "node_modules/(?!\\.pnpm/)(?!(@heavyai|robust-predicates|delaunator|d3-.*|axios|internmap|formdata-polyfill|fetch-blob|data-uri-to-buffer|node-fetch|vega|suneditor|quill-next|@quill-next|parchment|lodash-es|legendables|@mapbox-controls|@mapbox|vega-.*|cheerio|cheerio-.*))"
   ],
   setupFiles: ["jest-canvas-mock", "<rootDir>/test-config/jest-shim"]
 }
@@ -48,11 +47,23 @@ module.exports = {
   },
   projects: [
     {
+      testEnvironment: "jsdom",
+      displayName: "PACKAGES",
+      testMatch: ["<rootDir>/packages/**/*.unit.test.js"],
+      transform: baseConfig.transform,
+      transformIgnorePatterns: baseConfig.transformIgnorePatterns,
+      moduleNameMapper: baseConfig.moduleNameMapper
+    },
+    {
       ...baseConfig,
       displayName: "UNIT",
       testMatch: [
         "<rootDir>/src/**/?(*.)unit.test.js?(x)",
-        "<rootDir>/src/**/?(*.)unit.test.ts?(x)"
+        "<rootDir>/src/**/?(*.)unit.test.ts?(x)",
+        // Restored after explicit Wave 0 legacy-suite assessment.
+        "<rootDir>/src/actions/dashboard-action-creators.unit.spec.js",
+        "<rootDir>/src/reducers/data-source-higher-order-reducer.unit.spec.js",
+        "<rootDir>/src/charts/utils/coordinate-helpers.unit.spec.js"
       ],
       setupFilesAfterEnv: ["<rootDir>/test-config/setup-jest.js"]
     },
